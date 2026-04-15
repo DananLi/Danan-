@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -735,7 +735,6 @@ const app = {
     const sum = this.pcts.ambition + this.pcts.wisdom + this.pcts.devotion;
     if (sum !== 100) this.pcts[this.mainPath] += (100 - sum);
 
-    this.buildShareUrl();
     this.showSection("result");
     this.renderResult();
   },
