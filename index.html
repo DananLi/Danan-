@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -505,14 +505,7 @@ p  { font-size: clamp(0.9rem,2vw,1.1rem); line-height: 2.2; letter-spacing: 0.05
   <div class="result-desc" id="resultDesc"></div>
   <div id="eventsTimeline"></div>
   <div class="result-quote" id="resultQuote"></div>
-  <div class="share-area" id="shareArea">
-    <div class="share-label">分享给朋友</div>
-    <div class="share-url-box">
-      <input class="share-url" id="shareUrl" type="text" readonly>
-      <button class="btn-copy" id="copyBtn" onclick="app.copyLink()">复制链接</button>
-    </div>
-    <div class="wechat-note">复制链接后，直接粘贴到微信发送给朋友</div>
-  </div>
+
   <div class="btn-reset" id="resetArea">
     <button class="btn" onclick="app.reset()">重新占卜</button>
   </div>
@@ -807,47 +800,14 @@ const app = {
       setTimeout(() => tl.querySelectorAll(".tl-item").forEach(el => el.classList.add("show")), 1800);
     }
 
-    // Share URL
-    document.getElementById("shareUrl").value = this.shareUrl;
-
-    // Reveal desc/quote/share
+    // Reveal desc/quote
     setTimeout(() => {
       desc.classList.add("show");
       quote.classList.add("show");
-      document.getElementById("shareArea").classList.add("show");
       document.getElementById("resetArea").classList.add("show");
       // Big burst
       this.burstParticles(window.innerWidth/2, window.innerHeight/2, 30);
     }, 1200);
-  },
-
-  buildShareUrl() {
-    const base = (window.__PUBLIC_URL__ && window.__PUBLIC_URL__ !== 'undefined')
-      ? window.__PUBLIC_URL__
-      : (location.origin + location.pathname);
-    const s = `${this.scores.ambition}-${this.scores.wisdom}-${this.scores.devotion}`;
-    this.shareUrl = `${base}?r=${this.mainPath}&s=${s}`;
-  },
-
-  copyLink() {
-    const inp = document.getElementById("shareUrl");
-    inp.select();
-    try {
-      navigator.clipboard.writeText(inp.value).then(() => {
-        const btn = document.getElementById("copyBtn");
-        btn.textContent = "已复制 ✓";
-        btn.classList.add("copied");
-        setTimeout(() => { btn.textContent = "复制链接"; btn.classList.remove("copied"); }, 2000);
-      }).catch(() => {
-        document.execCommand("copy");
-        const btn = document.getElementById("copyBtn");
-        btn.textContent = "已复制 ✓";
-        btn.classList.add("copied");
-        setTimeout(() => { btn.textContent = "复制链接"; btn.classList.remove("copied"); }, 2000);
-      });
-    } catch(e) {
-      document.execCommand("copy");
-    }
   },
 
   showResult(mainPath) {
@@ -868,7 +828,6 @@ const app = {
     document.querySelectorAll(".path-card").forEach(el => el.classList.remove("show"));
     document.getElementById("resultDesc").classList.remove("show");
     document.getElementById("resultQuote").classList.remove("show");
-    document.getElementById("shareArea").classList.remove("show");
     document.getElementById("resetArea").classList.remove("show");
     document.querySelectorAll(".p-bar").forEach(el => { el.style.width = "0"; });
     this.showSection("home");
@@ -948,6 +907,6 @@ const app = {
 
 app.init();
 </script>
-<script>window.__PUBLIC_URL__ = 'https://leisure-virtual-dem-red.trycloudflare.com';</script>
+
 </body>
 </html>
