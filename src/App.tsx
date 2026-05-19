@@ -5,7 +5,7 @@ import {
   Box,
 } from '@mui/material';
 import { darkTheme, lightTheme } from './theme';
-import { PromptInput, SizePreset, PrintSizePreset } from './types';
+import { PromptInput, SizePreset, PrintSizePreset, StyleContext } from './types';
 import { sizePresets } from './data/sizes';
 import { printSizePresets } from './data/printSizes';
 import { sceneOptions } from './data/scenes';
@@ -75,6 +75,7 @@ const App: React.FC = () => {
   const [isDark, setIsDark] = useState(true);
   const [input, setInput] = useState<PromptInput>(defaultInput);
   const [generationTrigger, setGenerationTrigger] = useState(0);
+  const [searchEnhancedPrompt, setSearchEnhancedPrompt] = useState<string | null>(null);
 
   const handleToggleTheme = useCallback(() => {
     setIsDark((prev) => !prev);
@@ -90,7 +91,14 @@ const App: React.FC = () => {
     setGenerationTrigger((prev) => prev + 1);
   }, []);
 
-  const prompt = buildPrompt(input);
+  /** Handle search-enhanced prompt: set the enhanced prompt and trigger generation */
+  const handleSearchEnhance = useCallback((enhancedPrompt: string, _styleContext: StyleContext) => {
+    setSearchEnhancedPrompt(enhancedPrompt);
+    // Auto-trigger generation with the enhanced prompt
+    setGenerationTrigger((prev) => prev + 1);
+  }, []);
+
+  const prompt = searchEnhancedPrompt ?? buildPrompt(input);
   const dims = getImageDimensions(input);
 
   return (
@@ -133,8 +141,13 @@ const App: React.FC = () => {
             <InputPanel
               isDark={isDark}
               input={input}
-              onInputChange={setInput}
+              onInputChange={(newInput) => {
+                setInput(newInput);
+                // Clear search enhancement when input changes
+                setSearchEnhancedPrompt(null);
+              }}
               onGenerate={handleGenerate}
+              onSearchEnhance={handleSearchEnhance}
             />
           </Box>
 
