@@ -98,3 +98,37 @@ export interface ApiConfig {
   /** Volcengine model endpoint ID */
   modelEndpoint: string;
 }
+
+/** A single search result item from web search */
+export interface SearchResult {
+  /** Title of the result */
+  title: string;
+  /** Snippet / description */
+  snippet: string;
+  /** URL of the result page */
+  link: string;
+  /** Thumbnail image URL (if available) */
+  thumbnailUrl?: string;
+  /** Full-size image URL (if available) */
+  imageUrl?: string;
+  /** Image width (if available) */
+  imageWidth?: number;
+  /** Image height (if available) */
+  imageHeight?: number;
+  /** Source context / display link */
+  context?: string;
+}
+
+/** Extracted style context from search results */
+export interface StyleContext {
+  /** Color palette keywords extracted from search results */
+  colorKeywords: string[];
+  /** Design style keywords (e.g., minimalist, vibrant) */
+  styleKeywords: string[];
+  /** Mood / atmosphere keywords (e.g., warm, professional) */
+  moodKeywords: string[];
+  /** Brand attribute keywords (e.g., premium, playful) */
+  brandKeywords: string[];
+  /** Combined enhancement text to append to the original prompt */
+  enhancementText: string;
+}
