@@ -6,17 +6,25 @@ import {
   Button,
   Snackbar,
   Alert,
+  Tooltip,
 } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import SearchIcon from '@mui/icons-material/Search';
 import SizeSelector from './SizeSelector';
 import SceneSelector from './SceneSelector';
-import { PromptInput } from '../types';
+import SearchDialog from './SearchDialog';
+import { PromptInput, StyleContext } from '../types';
+import { isSearchConfigured } from '../utils/webSearch';
 
 interface InputPanelProps {
   isDark: boolean;
   input: PromptInput;
   onInputChange: (input: PromptInput) => void;
   onGenerate: () => void;
+  /** Enhanced prompt from search (overrides default prompt if set) */
+  searchEnhancedPrompt?: string;
+  /** Callback when search enhances the prompt */
+  onSearchEnhance: (enhancedPrompt: string, styleContext: StyleContext) => void;
 }
 
 /** Left panel containing user inputs for image generation */
@@ -25,8 +33,10 @@ const InputPanel: React.FC<InputPanelProps> = ({
   input,
   onInputChange,
   onGenerate,
+  onSearchEnhance,
 }) => {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [searchDialogOpen, setSearchDialogOpen] = React.useState(false);
 
   const handleGenerate = () => {
     if (!input.description.trim()) {
@@ -119,29 +129,71 @@ const InputPanel: React.FC<InputPanelProps> = ({
         onModelChange={(model) => onInputChange({ ...input, model })}
       />
 
-      {/* Generate Button */}
-      <Button
-        variant="contained"
-        size="large"
-        onClick={handleGenerate}
-        startIcon={<AutoAwesomeIcon />}
-        sx={{
-          background: 'linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%)',
-          color: '#fff',
-          py: 1.5,
-          fontSize: '1rem',
-          fontWeight: 700,
-          letterSpacing: '0.5px',
-          boxShadow: '0 4px 20px rgba(233,30,99,0.4)',
-          '&:hover': {
-            background: 'linear-gradient(135deg, #d81b60 0%, #8e24aa 50%, #5e35b1 100%)',
-            boxShadow: '0 6px 28px rgba(233,30,99,0.5)',
-          },
-          transition: 'all 0.3s ease',
-        }}
-      >
-        生成图片
-      </Button>
+      {/* Action Buttons */}
+      <Box sx={{ display: 'flex', gap: 1.5 }}>
+        <Tooltip title={isSearchConfigured() ? '搜索全网品牌与风格参考，增强提示词后生成' : '需配置 Google Custom Search API（见 .env）'}>
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={() => {
+              if (!input.description.trim()) {
+                setSnackbarOpen(true);
+                return;
+              }
+              setSearchDialogOpen(true);
+            }}
+            startIcon={<SearchIcon />}
+            sx={{
+              flex: 1,
+              borderColor: isDark ? 'rgba(33,150,243,0.4)' : 'rgba(33,150,243,0.3)',
+              color: '#2196f3',
+              py: 1.5,
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              '&:hover': {
+                borderColor: '#2196f3',
+                bgcolor: 'rgba(33,150,243,0.05)',
+              },
+              transition: 'all 0.3s ease',
+            }}
+          >
+            搜索参考
+          </Button>
+        </Tooltip>
+
+        <Button
+          variant="contained"
+          size="large"
+          onClick={handleGenerate}
+          startIcon={<AutoAwesomeIcon />}
+          sx={{
+            flex: 1,
+            background: 'linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #673ab7 100%)',
+            color: '#fff',
+            py: 1.5,
+            fontSize: '0.9rem',
+            fontWeight: 700,
+            letterSpacing: '0.5px',
+            boxShadow: '0 4px 20px rgba(233,30,99,0.4)',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #d81b60 0%, #8e24aa 50%, #5e35b1 100%)',
+              boxShadow: '0 6px 28px rgba(233,30,99,0.5)',
+            },
+            transition: 'all 0.3s ease',
+          }}
+        >
+          生成图片
+        </Button>
+      </Box>
+
+      {/* Search Dialog */}
+      <SearchDialog
+        open={searchDialogOpen}
+        onClose={() => setSearchDialogOpen(false)}
+        description={input.description}
+        onConfirm={onSearchEnhance}
+        isDark={isDark}
+      />
 
       <Snackbar
         open={snackbarOpen}
